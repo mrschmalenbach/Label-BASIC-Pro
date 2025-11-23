@@ -133,12 +133,16 @@ Other LB statements may be multi-statement lines separated by `:`.
 
 Notes:
 
-- Supports numeric and string constants  
-- With `DEFINE ON`, numeric constants (0–65535) emit as `#DEFINE`  
-- String constants always emit as assignments  
-- Identifiers are case-insensitive  
+- Supports numeric and string constants.
+- With `DEFINE ON`, numeric constants (0–65535) emit as `#DEFINE <name of constant> <16 bit unsigned value>`.
+- String constants ALWATS emit as assignments, so a string variable with the same name as the constant and with a trailing "$" string type indicator is created with the stated constant value. 
+- Identifiers are case-insensitive.
+- Labels, constants and variable names must all have unique identifier names.
+- Constants emitted as variables rather than #DEFINEs tend to be more quickly processed by the BASIC V2 interpreter. 
 
 ## 4.2 Built-in System Constants
+
+The standard BASIC V2 constant `PI` is available, with the value 3.14159265.
 
 LBP automatically inserts:
 
@@ -147,8 +151,8 @@ LBP automatically inserts:
 
 ### Why TRUE = -1?
 
-- Commodore BASIC uses all-bits-set for TRUE  
-- Ensures correct behaviour with NOT, AND, OR  
+- Commodore BASIC uses all-bits-clear for FALSE and `NOT FALSE` is the same as `TRUE` which has all bits the inverse of all-bits-clear which means all bits are 1, and in signed 16 bit terms this equates to '-1'.  
+- Ensures correct behaviour with NOT, AND, OR, because for working with these operators the numeric value, always a float, is translated to a signed 16 bit value for bitwise behaviour. An error is raised by the BASIC V2 interpreter if the numeric value is not in the -32768 to +32767 range for 16 bit signed values.
 
 ---
 
@@ -157,16 +161,16 @@ LBP automatically inserts:
 Example:
 
     ENUM COLOUR
-      RED            : REM 1
-      GREEN = 5      : REM 5
-      BLUE           : REM 6
+      RED            : REM value =1
+      GREEN = 5      : REM value =5 as stated
+      BLUE           : REM value =6, which is 1 more than the last, 5
     END ENUM
 
 Behaviour:
 
-- First member defaults to 1  
-- Members without explicit value auto-increment  
-- Emitted as `#DEFINE` or assignment depending on `DEFINE` option  
+- First member defaults to 1.
+- Members without explicit value auto-increment.
+- Emitted as `#DEFINE` or assignment depending on `DEFINE` option.
 
 ---
 
@@ -186,7 +190,7 @@ Rules:
 - `ELSE` alone  
 - `END IF` alone  
 
-LBP lowers to labels and GOTOs.
+LBP transpiler lowers this to sequence of labels and GOTO statements.
 
 ## 6.2 Nested IFs (Fully Supported)
 
@@ -218,6 +222,7 @@ Use nested IF:
 # 7. Looping Constructs & Loop Control
 
 ## 7.1 WHILE / WEND
+WHILE <expr> is true, the loop will iterate or loop. **The loop might not execute at all**.
 
     WHILE COUNT < 10
       PRINT COUNT
@@ -225,6 +230,7 @@ Use nested IF:
     WEND
 
 ## 7.2 REPEAT / UNTIL
+REPEAT... UNTIL <expr> is true, the loop will iterate or loop. **The loop will ALWAYS execute at least once**.
 
     REPEAT
       INPUT "VALUE:"; V%
@@ -243,6 +249,10 @@ Supported:
     EXIT LOOP
     CONTINUE LOOP
 
+`EXIT` means that the current stated loop type (WHILE or REPEAT) is exited, meaning code execution jumps immediately out of the loop and picks up with the very first statement after the corresponding `WEND` or `UNTIL` statement, depending on loop type.
+
+`UNTIL` means that the current stated loop type (WHILE or REPEAT) is started from the next iteration, meaning code execution jumps immediately back to the start of the loop and picks up with the very first statement after the corresponding `WHILE` or `REPEAT` statement, depending on loop type.
+
 Example:
 
     WHILE X < 100
@@ -258,7 +268,7 @@ Another:
       PRINT "EVEN:"; X
     UNTIL X >= 20
 
-LBP searches the loop stack for the nearest matching loop.
+LBP searches the loop stack for the nearest matching loop. This is because a specific loop type (`WHILE` or `REPEAT`) has not been specified.
 
 ---
 
@@ -300,47 +310,138 @@ This is the complete error set for v1.0 RC1.
 
 ## 9.1 ELSE Without IF
 
+Every `ELSE` statement must be part of an earlier `IF-THEN` statement that doesn't already have a prior `ELSE` or `END IF` statement or keyword associated with it. 
+
+**Message:**
+
     SYNTAX ERROR: ELSE WITHOUT IF AT LINE n
+
+**Cause:** An ELSE appears when no structured IF statement or construct is active.
+
+**Example (invalid)**
+
+    PRINT "HELLO"
+    ELSE
+
+**Fix:**
+Ensure the IF block exists:
+
+    IF X THEN
+      PRINT "HELLO"
+    ELSE
+      PRINT "WORLD"
+    END IF
 
 ---
 
 ## 9.2 Multiple ELSE For IF
 
+This relates to 9.1 above, and arises when there's already an `ELSE` statement associated with the last IF-THEN statement that hasn't yet been closed with an associated `END IF` statement.
+
+**Message:**
+
     SYNTAX ERROR: MULTIPLE ELSE FOR IF AT LINE n
+
+**Cause:** An ELSE appears when previous ELSE statements have appeared associated with the same `IF-THEN` construct.
+
+**Example (invalid)**
+
+    IF X THEN
+      PRINT "A"
+    ELSE
+      PRINT "B"
+    ELSE
+      PRINT "C"    ← invalid
+    END IF
+    
+**Fix:**
+Use nested IFs instead of chained ELSEIF (not supported yet):
+
+    IF X THEN
+      PRINT "A"
+    ELSE
+      IF Y THEN
+        PRINT "B"
+      ELSE
+        PRINT "C"
+      END IF
+    END IF
 
 ---
 
 ## 9.3 END IF Without IF
 
+**Message:**
+
     SYNTAX ERROR: END IF WITHOUT IF AT LINE n
+
+**Cause:** No IF block is currently open.
+
+**Example:**
+
+    END IF
+
+**Fix:**
+Ensure every `IF-THEN` statement has just one and only one matching/closing `END IF` statement.
 
 ---
 
 ## 9.4 Missing END IF at EOF
 
+**Message:**
+
     SYNTAX ERROR: MISSING END IF FOR IF STARTED AT LINE m
+
+**Cause:** Reached end-of-file with one or more IF blocks still open.
+
+**Example:**
+
+    IF X THEN
+      PRINT "HELLO"
+
+**Fix:** Add corresponding END IF.
 
 ---
 
 ## 9.5 WEND Without WHILE
 
+**Message:**
+
     SYNTAX ERROR: WEND WITHOUT WHILE AT LINE n
+
+**Cause:** WEND appears when no WHILE is active.
 
 ---
 
 ## 9.6 UNTIL Without REPEAT
 
+**Message:**
+
     SYNTAX ERROR: UNTIL WITHOUT REPEAT AT LINE n
+
+**Cause:** An UNTIL is found, but there is no matching REPEAT.
 
 ---
 
 ## 9.7 UNTIL For Non-REPEAT Loop
 
+**Message:**
+
     SYNTAX ERROR: UNTIL FOR NON-REPEAT LOOP AT LINE n
+
+**Cause:** Top of loop stack is a WHILE loop, not a REPEAT loop.
+
+**Example:**
+
+    WHILE X<10
+      PRINT X
+    UNTIL X=5     ← invalid: cannot close WHILE with UNTIL
 
 ---
 
 ## 9.8 Missing Loop Terminator At EOF
+
+**Message:**
 
 WHILE:
 
@@ -350,15 +451,36 @@ REPEAT:
 
     SYNTAX ERROR: MISSING UNTIL FOR REPEAT STARTED AT LINE m
 
+**Cause:** Reached EOF with an unterminated WHILE or REPEAT block.
+
 ---
 
 ## 9.9 Colon Not Allowed On Structured Line
 
+**Message:**
+
     SYNTAX ERROR: COLON NOT ALLOWED ON STRUCTURED LINE AT LBP LINE n
+
+Applies to:
+- CONSTANT
+- ENDCONST
+- ENUM
+- END ENUM
+- ELSE
+- END IF
+- WHILE
+- WEND
+- REPEAT
+- UNTIL
+- All REM ##OPTION lines
+
+**Except for structured IF headers, which have special rules.**
 
 ---
 
-## 9.10 Structured IF Header Colon Rules
+## 9.10 Structured (multi-line) IF Header Colon Rules
+
+There's a little bit of nuance here so familiarise yourself with this aspect. It can be the source of harder-to-track down errors in your source code.
 
 ### Valid:
 
@@ -371,27 +493,58 @@ REPEAT:
     IF X THEN : PRINT "NO"
     IF X THEN : A=A+1
 
-Reason: BASIC interprets these as single-line IFs, where the THEN-body must be non-empty.
+**Reason:** BASIC V2 interprets these as single-line IFs, where the THEN-body, the statement after the `THEN` keyword can't be empty.
 
 ### Valid single-line IFs:
 
     IF X THEN PRINT "YES"
     IF X THEN A=A+1 : PRINT "DONE"
-    IF X THEN : REM COMMENT
 
+### Invalid structured IF headers:**
+
+    IF X THEN : PRINT "NO"      ← invalid
+    IF X THEN : A=A+1           ← invalid
+    IF X THEN : GOSUB MENU      ← invalid
+
+These are interpreted as single-line IFs, but since the THEN-body would be empty (the expression begins after a colon), BASIC V2 rejects them as malformed.
+
+LBP treats:
+- `IF X THEN + comment`   → structured IF
+- `IF X THEN : PRINT ...` → illegal for structured IF; passes through or errors depending on context
+- `IF X THEN : REM ...`   → structured IF header
+   
 ---
 
 ## 9.11 Reserved Label Prefix “Z__”
 
+**Message:**
+
     SYNTAX ERROR: LABEL MAY NOT BEGIN WITH 'Z__' (RESERVED) AT LINE n
+
+**Cause:** User code attempts to define a label with the prefix reserved for LBP-generated code.
+
+**Example (invalid):**
+
+    Z__LOOP:
+    PRINT "HELLO"
+
+LBP uses Z__ exclusively for generated labels (IF/WHILE/REPEAT lowering).
+User code must not define or reference labels beginning with Z__.
 
 ---
 
 ## 9.12 Disk I/O Errors
 
+These come directly from the X16 DOS channel and are not generated by LBP itself.
+
+**Typical messages:**
+
     DISK ERROR 62 - FILE NOT FOUND
     DISK ERROR 63 - FILE EXISTS
     DISK ERROR 50 - RECORD NOT PRESENT
+    DISK ERROR 70 - NO CHANNEL
+
+LBP simply reports them and halts.
 
 ---
 
