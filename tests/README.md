@@ -38,7 +38,9 @@ If any `evil/` test transpiles successfully, something has gone wrong.
 
 1. Run each test via LBP:
 
+```
     RUN
+```
 
 2. Provide the appropriate `good/*.lbp` or `evil/*.lbp` filename.
 3. Verify behaviour:
