@@ -64,19 +64,25 @@ To transpile any example:
 
 1. Launch the LBP transpiler:
 
+```
     RUN
+```
 
 2. Enter the filename when prompted:
 
+```
     ex_hero_client_tracker.lbp
+```
 
 3. Accept or override the default output filename.
 4. Run BASLOAD on the generated `.bas` file.
 
 Example:
 
+```
     BASLOAD “ex_hero_client_tracker.bas”
     RUN
+```
 
 ---
 
