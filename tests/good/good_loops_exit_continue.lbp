@@ -1,1 +1,76 @@
-REM good_loops_exit_continue.lbpREM Well-formed loops with EXIT/CONTINUE variantsREM ##OPTION STRICT_ERR ONPRINT "STARTING LOOP TESTS..."REM -----------------------------------------REM 1) WHILE / WEND with CONTINUE WHILE / EXIT WHILEREM -----------------------------------------I% = 0PRINT "TEST 1: WHILE/WEND WITH CONTINUE/EXIT"WHILE I%<10  I% = I% + 1  IF I%=5 THEN    PRINT "  SKIPPING I=5 USING CONTINUE WHILE"    CONTINUE WHILE  END IF  IF I%>8 THEN    PRINT "  EXITING WHILE AT I=";I%    EXIT WHILE  END IF  PRINT "  I=";I%WENDPRINT "TEST 1 COMPLETE. FINAL I=";I%REM -----------------------------------------REM 2) REPEAT / UNTIL with CONTINUE REPEATREM -----------------------------------------J% = 0PRINT "TEST 2: REPEAT/UNTIL WITH CONTINUE REPEAT"REPEAT  J% = J% + 1  IF J%=2 THEN    PRINT "  SKIPPING J=2 USING CONTINUE REPEAT"    CONTINUE REPEAT  END IF  PRINT "  J=";J%UNTIL J%>=4PRINT "TEST 2 COMPLETE. FINAL J=";J%REM -----------------------------------------REM 3) EXIT LOOP on nearest enclosing loop (WHILE example)REM -----------------------------------------K% = 0PRINT "TEST 3: EXIT LOOP INSIDE WHILE"WHILE K%<10  K% = K% + 1  IF K%>3 THEN    PRINT "  EXIT LOOP AT K=";K%    EXIT LOOP  END IF  PRINT "  K=";K%WENDPRINT "TEST 3 COMPLETE. FINAL K=";K%PRINT "ALL LOOP TESTS COMPLETE."
+REM good_loops_exit_continue.lbp
+REM Well-formed loops with EXIT/CONTINUE variants
+
+REM ##OPTION STRICT_ERR ON
+
+PRINT "STARTING LOOP TESTS..."
+
+REM -----------------------------------------
+REM 1) WHILE / WEND with CONTINUE WHILE / EXIT WHILE
+REM -----------------------------------------
+
+I% = 0
+
+PRINT "TEST 1: WHILE/WEND WITH CONTINUE/EXIT"
+
+WHILE I%<10
+  I% = I% + 1
+
+  IF I%=5 THEN
+    PRINT "  SKIPPING I=5 USING CONTINUE WHILE"
+    CONTINUE WHILE
+  END IF
+
+  IF I%>8 THEN
+    PRINT "  EXITING WHILE AT I=";I%
+    EXIT WHILE
+  END IF
+
+  PRINT "  I=";I%
+WEND
+
+PRINT "TEST 1 COMPLETE. FINAL I=";I%
+
+REM -----------------------------------------
+REM 2) REPEAT / UNTIL with CONTINUE REPEAT
+REM -----------------------------------------
+
+J% = 0
+
+PRINT "TEST 2: REPEAT/UNTIL WITH CONTINUE REPEAT"
+
+REPEAT
+  J% = J% + 1
+
+  IF J%=2 THEN
+    PRINT "  SKIPPING J=2 USING CONTINUE REPEAT"
+    CONTINUE REPEAT
+  END IF
+
+  PRINT "  J=";J%
+UNTIL J%>=4
+
+PRINT "TEST 2 COMPLETE. FINAL J=";J%
+
+REM -----------------------------------------
+REM 3) EXIT LOOP on nearest enclosing loop (WHILE example)
+REM -----------------------------------------
+
+K% = 0
+
+PRINT "TEST 3: EXIT LOOP INSIDE WHILE"
+
+WHILE K%<10
+  K% = K% + 1
+
+  IF K%>3 THEN
+    PRINT "  EXIT LOOP AT K=";K%
+    EXIT LOOP
+  END IF
+
+  PRINT "  K=";K%
+WEND
+
+PRINT "TEST 3 COMPLETE. FINAL K=";K%
+
+PRINT "ALL LOOP TESTS COMPLETE."
