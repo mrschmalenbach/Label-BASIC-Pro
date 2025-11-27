@@ -1,1 +1,90 @@
-REM good_all_features_status_panel.lbpREM Mix: options, constants, enums, IFs, WHILE/WEND, REPEAT/UNTILREM ##OPTION STRICT_ERR ONREM ##OPTION DEFINE ONREM ##OPTION REMPASS ONREM -----------------------------------------REM CONSTANTSREM -----------------------------------------CONSTANTMAX_HEALTH% = 100MAX_ENERGY% = 50WELCOME_MSG$ = "STATUS PANEL DEMO"ENDCONSTCONSTANT TICK_LIMIT% = 10REM -----------------------------------------REM ENUMSREM -----------------------------------------ENUM MODESMODE_IDLEMODE_ACTIVEMODE_WARNINGEND ENUMREM -----------------------------------------REM INITIAL STATEREM -----------------------------------------PRINT WELCOME_MSG$CURRENT.MODE% = MODE_IDLEHEALTH% = MAX_HEALTH%ENERGY% = MAX_ENERGY%TICK% = 0PRINT "INIT:"PRINT "  HEALTH=";HEALTH%;PRINT "  ENERGY=";ENERGY%;PRINT "  MODE=";CURRENT.MODE%REM -----------------------------------------REM MAIN LOOPREM -----------------------------------------WHILE TICK%<TICK_LIMIT%  TICK% = TICK% + 1  REM Simulate some “usage”  ENERGY% = ENERGY% - 3  HEALTH% = HEALTH% - 1  IF ENERGY%<0 THEN    ENERGY% = 0  END IF  IF HEALTH%<0 THEN    HEALTH% = 0  END IF  REM Mode logic  IF HEALTH%>70 THEN    CURRENT.MODE% = MODE_ACTIVE  ELSE    IF HEALTH%>30 THEN      CURRENT.MODE% = MODE_IDLE    ELSE      CURRENT.MODE% = MODE_WARNING    END IF  END IF  PRINT  PRINT "TICK";TICK%  PRINT "  HEALTH=";HEALTH%;  PRINT "  ENERGY=";ENERGY%;  PRINT "  MODE=";CURRENT.MODE%  REM Early break if everything is “critical”  IF HEALTH%=0 THEN    PRINT "HEALTH IS ZERO - EXIT LOOP"    EXIT WHILE  END IFWENDPRINTPRINT "STATUS PANEL DEMO COMPLETE."
+REM good_all_features_status_panel.lbp
+REM Mix: options, constants, enums, IFs, WHILE/WEND, REPEAT/UNTIL
+
+REM ##OPTION STRICT_ERR ON
+REM ##OPTION DEFINE ON
+REM ##OPTION REMPASS ON
+
+REM -----------------------------------------
+REM CONSTANTS
+REM -----------------------------------------
+
+CONSTANT
+MAX_HEALTH% = 100
+MAX_ENERGY% = 50
+WELCOME_MSG$ = "STATUS PANEL DEMO"
+ENDCONST
+
+CONSTANT TICK_LIMIT% = 10
+
+REM -----------------------------------------
+REM ENUMS
+REM -----------------------------------------
+
+ENUM MODES
+MODE_IDLE
+MODE_ACTIVE
+MODE_WARNING
+END ENUM
+
+REM -----------------------------------------
+REM INITIAL STATE
+REM -----------------------------------------
+
+PRINT WELCOME_MSG$
+
+CURRENT.MODE% = MODE_IDLE
+HEALTH% = MAX_HEALTH%
+ENERGY% = MAX_ENERGY%
+TICK% = 0
+
+PRINT "INIT:"
+PRINT "  HEALTH=";HEALTH%;
+PRINT "  ENERGY=";ENERGY%;
+PRINT "  MODE=";CURRENT.MODE%
+
+REM -----------------------------------------
+REM MAIN LOOP
+REM -----------------------------------------
+
+WHILE TICK%<TICK_LIMIT%
+  TICK% = TICK% + 1
+
+  REM Simulate some “usage”
+  ENERGY% = ENERGY% - 3
+  HEALTH% = HEALTH% - 1
+
+  IF ENERGY%<0 THEN
+    ENERGY% = 0
+  END IF
+
+  IF HEALTH%<0 THEN
+    HEALTH% = 0
+  END IF
+
+  REM Mode logic
+  IF HEALTH%>70 THEN
+    CURRENT.MODE% = MODE_ACTIVE
+  ELSE
+    IF HEALTH%>30 THEN
+      CURRENT.MODE% = MODE_IDLE
+    ELSE
+      CURRENT.MODE% = MODE_WARNING
+    END IF
+  END IF
+
+  PRINT
+  PRINT "TICK";TICK%
+  PRINT "  HEALTH=";HEALTH%;
+  PRINT "  ENERGY=";ENERGY%;
+  PRINT "  MODE=";CURRENT.MODE%
+
+  REM Early break if everything is “critical”
+  IF HEALTH%=0 THEN
+    PRINT "HEALTH IS ZERO - EXIT LOOP"
+    EXIT WHILE
+  END IF
+WEND
+
+PRINT
+PRINT "STATUS PANEL DEMO COMPLETE."
