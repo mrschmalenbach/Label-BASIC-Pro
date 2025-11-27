@@ -1,1 +1,64 @@
-REM ============================================================REM  EVIL COLONS 01REM  - MIX OF LEGAL AND ILLEGAL COLON USESREM  - EXERCISES LBP.CHECK.COLON.STRUCTUREDREM ============================================================REM ##OPTION STRICT_ERR ONREM --- SAFE CASES ---PRINT "NO COLON HERE"REM colon in string only – should be OKPRINT "TIME 12:34:56"REM colon before NON-structured keyword – allowedPRINT "HELLO": GOSUB HELLO.SUBREM colon in DATA-ish text, but LBP doesn't care about DATA, just stringsREM so this is OKPRINT "ENUM: END ENUM: IF: END IF"HELLO.SUB:  PRINT "HELLO FROM SUB"  RETURNREM --- ILLEGAL: STRUCTURED KEYWORDS AFTER COLON ---REM IF after colonPRINT "ABOUT TO DO IF": IF A=1 THEN PRINT "BAD"REM ELSE after colonIF X=1 THEN PRINT "OK": ELSE PRINT "BAD ELSE AFTER COLON"REM END IF after colonIF Y=1 THEN PRINT "OK": END IFREM WHILE after colonPRINT "TEST": WHILE A<>0REM REPEAT after colonPRINT "START": REPEATREM UNTIL after colonREPEAT: PRINT "BODY": UNTIL A=0: PRINT "AFTER UNTIL"REM CONSTANT after colonCONSTANT FOO = 1: BAR = 2REM ENDCONST after colonCONSTANT  A = 1  B = 2ENDCONST: PRINT "SHOULD ERROR"REM ENUM after colonPRINT "ENUM START": ENUM COLOURREM END ENUM after colonENUM FLAG  A  BEND ENUM: PRINT "AFTER ENUM"
+REM ============================================================
+REM  EVIL COLONS 01
+REM  - MIX OF LEGAL AND ILLEGAL COLON USES
+REM  - EXERCISES LBP.CHECK.COLON.STRUCTURED
+REM ============================================================
+
+REM ##OPTION STRICT_ERR ON
+
+REM --- SAFE CASES ---
+
+PRINT "NO COLON HERE"
+
+REM colon in string only – should be OK
+PRINT "TIME 12:34:56"
+
+REM colon before NON-structured keyword – allowed
+PRINT "HELLO": GOSUB HELLO.SUB
+
+REM colon in DATA-ish text, but LBP doesn't care about DATA, just strings
+REM so this is OK
+PRINT "ENUM: END ENUM: IF: END IF"
+
+HELLO.SUB:
+  PRINT "HELLO FROM SUB"
+  RETURN
+
+
+REM --- ILLEGAL: STRUCTURED KEYWORDS AFTER COLON ---
+
+REM IF after colon
+PRINT "ABOUT TO DO IF": IF A=1 THEN PRINT "BAD"
+
+REM ELSE after colon
+IF X=1 THEN PRINT "OK": ELSE PRINT "BAD ELSE AFTER COLON"
+
+REM END IF after colon
+IF Y=1 THEN PRINT "OK": END IF
+
+REM WHILE after colon
+PRINT "TEST": WHILE A<>0
+
+REM REPEAT after colon
+PRINT "START": REPEAT
+
+REM UNTIL after colon
+REPEAT: PRINT "BODY": UNTIL A=0: PRINT "AFTER UNTIL"
+
+REM CONSTANT after colon
+CONSTANT FOO = 1: BAR = 2
+
+REM ENDCONST after colon
+CONSTANT
+  A = 1
+  B = 2
+ENDCONST: PRINT "SHOULD ERROR"
+
+REM ENUM after colon
+PRINT "ENUM START": ENUM COLOUR
+
+REM END ENUM after colon
+ENUM FLAG
+  A
+  B
+END ENUM: PRINT "AFTER ENUM"
