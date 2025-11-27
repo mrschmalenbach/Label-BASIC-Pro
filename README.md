@@ -406,11 +406,11 @@ It correctly handles:
 
 ## How to run it (on X16)
 
-1. Copy `LBP.PRG` to your X16 disk/image.
+1. Download `LBPTRC1.PRG` from the 'bin' folder here on GIT Hub and copy to your X16 disk/image.
 2. From BASIC:
 
    ```basic
-   LOAD "LBP.BAS"
+   LOAD "LBPTRC1.PRG"
    RUN
    ```
 
