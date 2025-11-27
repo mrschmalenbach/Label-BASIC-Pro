@@ -105,8 +105,10 @@ This is a very strong “everything together” sanity test for LBP RC1.
 
 1. Run each file through the transpiler:
 
-    LOAD “LBP.PRG”,8
+```
+    LOAD “LBPTRC1.PRG”,8
     RUN
+```
 
 2. Supply the test filename (e.g., `good_if_nesting.lbp`)
 
@@ -119,7 +121,9 @@ This is a very strong “everything together” sanity test for LBP RC1.
 
 Add to the top of the test file:
 
+```
     REM ##OPTION LOGGING ON
+```
 
 5. Compare the `.LOG` file to the on-screen output for divergence.
 
