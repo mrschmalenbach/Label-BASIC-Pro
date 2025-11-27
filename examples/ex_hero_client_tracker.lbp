@@ -1,1 +1,395 @@
-REM ============================================================REM  EX_HERO_CLIENT_TRACKER.LBPREM  - BUSINESS-FLAVOURED HERO DEMO FOR LABEL BASIC PROREM  - SHOWS:REM      * CONSTANT / CONSTANT BLOCKREM      * ENUMREM      * STRUCTURED IF / ELSE / END IFREM      * WHILE / WENDREM      * REPEAT / UNTILREM      * EXIT WHILEREM      * SIMPLE MENU + "SUBROUTINES" VIA GOSUBREM ============================================================REM ##OPTION DEFINE ONREM ##OPTION STRICT_ERR ONREM ##OPTION REMPASS ONREM ============================================================REM  CONSTANTS & ENUMSREM ============================================================CONSTANT  MAX.CLIENTS        = 15  NAME.WIDTH         = 18  BALANCE.INIT       = 0  BALANCE.SALE.STEP  = 100  BALANCE.PAY.STEP   = 50ENDCONSTENUM CLIENT.STATUS  ST_PROSPECT  ST_ACTIVE  ST_DORMANT  ST_LOSTEND ENUMREM ============================================================REM  GLOBAL STATEREM ============================================================DIM CL.NAME$(MAX.CLIENTS)DIM CL.STATUS%(MAX.CLIENTS)DIM CL.BALANCE%(MAX.CLIENTS)QUIT.FLAG% = 0REM WORK VARIABLESMENU.CHOICE% = 0IDX%         = 0TMP$         = ""STATUS.TEXT$ = ""REM ============================================================REM  MAIN ENTRYREM ============================================================MAIN:  GOSUB INIT.DATA  GOSUB INTRO.TEXT  REPEAT    GOSUB SHOW.MENU    GOSUB HANDLE.MENU  UNTIL QUIT.FLAG%<>0  GOSUB OUTRO.TEXT  ENDREM ============================================================REM  INIT.DATAREM  - RESET CLIENT ARRAYS TO KNOWN STATEREM ============================================================INIT.DATA:  IDX% = 1  WHILE IDX%<=MAX.CLIENTS    CL.NAME$(IDX%)    = ""    CL.STATUS%(IDX%)  = ST_PROSPECT    CL.BALANCE%(IDX%) = BALANCE.INIT    IDX% = IDX% + 1  WEND  RETURNREM ============================================================REM  INTRO / OUTROREM ============================================================INTRO.TEXT:  PRINT  PRINT "CLIENT TRACKER - LBP HERO DEMO"  PRINT "--------------------------------"  PRINT  PRINT "THIS SMALL PROGRAM TRACKS UP TO";MAX.CLIENTS;"CLIENTS."  PRINT "FOR EACH CLIENT IT STORES:"  PRINT "  * NAME"  PRINT "  * STATUS (PROSPECT / ACTIVE / DORMANT / LOST)"  PRINT "  * RUNNING BALANCE (POSITIVE = THEY OWE YOU)"  PRINT  RETURNOUTRO.TEXT:  PRINT  PRINT "GOODBYE FROM CLIENT TRACKER."  PRINT  PRINT "FINAL SUMMARY:"  GOSUB SHOW.SUMMARY  RETURNREM ============================================================REM  MENUREM ============================================================SHOW.MENU:  PRINT  PRINT "MAIN MENU"  PRINT "---------"  PRINT "1 - ADD / UPDATE CLIENT"  PRINT "2 - RECORD SALE (INCREASE BALANCE)"  PRINT "3 - RECORD PAYMENT (DECREASE BALANCE)"  PRINT "4 - LIST CLIENTS"  PRINT "5 - SUMMARY METRICS"  PRINT "6 - QUIT"  PRINT  INPUT "CHOICE (1-6)"; MENU.CHOICE%  RETURNHANDLE.MENU:  IF MENU.CHOICE%=1 THEN    GOSUB ADD.OR.UPDATE.CLIENT  ELSE    IF MENU.CHOICE%=2 THEN      GOSUB RECORD.SALE    ELSE      IF MENU.CHOICE%=3 THEN        GOSUB RECORD.PAYMENT      ELSE        IF MENU.CHOICE%=4 THEN          GOSUB LIST.CLIENTS        ELSE          IF MENU.CHOICE%=5 THEN            GOSUB SHOW.SUMMARY          ELSE            IF MENU.CHOICE%=6 THEN              QUIT.FLAG% = 1            ELSE              PRINT "PLEASE ENTER A NUMBER FROM 1 TO 6."            END IF          END IF        END IF      END IF    END IF  END IF  RETURNREM ============================================================REM  ADD / UPDATE CLIENTREM ============================================================ADD.OR.UPDATE.CLIENT:  PRINT  PRINT "ADD / UPDATE CLIENT"  PRINT "-------------------"  GOSUB PROMPT.CLIENT.INDEX  IF IDX%<1 THEN    PRINT "CANCELLED."    RETURN  END IF  PRINT "CURRENT NAME: "; CL.NAME$(IDX%)  INPUT "NEW NAME (EMPTY = LEAVE UNCHANGED)"; TMP$  IF TMP$<>"" THEN    CL.NAME$(IDX%) = TMP$  END IF  PRINT  PRINT "STATUS CODES:"  PRINT " 0 - PROSPECT"  PRINT " 1 - ACTIVE"  PRINT " 2 - DORMANT"  PRINT " 3 - LOST"  PRINT "CURRENT STATUS:";  GOSUB STATUS.TO.TEXT  PRINT STATUS.TEXT$  INPUT "NEW STATUS (0-3, -1 = LEAVE)"; NEW.ST%  IF NEW.ST%>=0 THEN    IF NEW.ST%<=3 THEN      CL.STATUS%(IDX%) = NEW.ST%    ELSE      PRINT "IGNORING INVALID STATUS."    END IF  END IF  PRINT  PRINT "CLIENT SAVED."  RETURNREM ============================================================REM  RECORD SALE / PAYMENTREM ============================================================RECORD.SALE:  PRINT  PRINT "RECORD SALE (CLIENT OWES YOU MORE)"  PRINT "----------------------------------"  GOSUB PROMPT.CLIENT.INDEX  IF IDX%<1 THEN    PRINT "CANCELLED."    RETURN  END IF  PRINT "CLIENT: "; CL.DISPLAY.NAME$(IDX%)  INPUT "AMOUNT (DEFAULT ";BALANCE.SALE.STEP;")"; AMT%  IF AMT%<=0 THEN    AMT% = BALANCE.SALE.STEP  END IF  CL.BALANCE%(IDX%) = CL.BALANCE%(IDX%) + AMT%  PRINT "NEW BALANCE:"; CL.BALANCE%(IDX%)  RETURNRECORD.PAYMENT:  PRINT  PRINT "RECORD PAYMENT (CLIENT OWES YOU LESS)"  PRINT "-------------------------------------"  GOSUB PROMPT.CLIENT.INDEX  IF IDX%<1 THEN    PRINT "CANCELLED."    RETURN  END IF  PRINT "CLIENT: "; CL.DISPLAY.NAME$(IDX%)  INPUT "AMOUNT (DEFAULT ";BALANCE.PAY.STEP;")"; AMT%  IF AMT%<=0 THEN    AMT% = BALANCE.PAY.STEP  END IF  CL.BALANCE%(IDX%) = CL.BALANCE%(IDX%) - AMT%  PRINT "NEW BALANCE:"; CL.BALANCE%(IDX%)  RETURNREM ============================================================REM  PROMPT FOR CLIENT INDEX (1..MAX, 0=CANCEL)REM  - USES STRUCTURED WHILE / EXIT WHILEREM ============================================================PROMPT.CLIENT.INDEX:  IDX% = -1  WHILE IDX%<0    PRINT    INPUT "CLIENT NUMBER (1-";MAX.CLIENTS;", 0=CANCEL)"; IDX%    IF IDX%=0 THEN      RETURN    END IF    IF IDX%<1 OR IDX%>MAX.CLIENTS THEN      PRINT "PLEASE ENTER A NUMBER BETWEEN 1 AND";MAX.CLIENTS;"OR 0 TO CANCEL."      IDX% = -1    ELSE      EXIT WHILE    END IF  WEND  RETURNREM ============================================================REM  CL.DISPLAY.NAME$REM  - RETURNS A NICELY FORMATTED NAME FOR CLIENT IDX%REM  - IF NAME IS EMPTY, USES "CLIENT n"REM ============================================================CL.DISPLAY.NAME$:  TMP$ = CL.NAME$(IDX%)  IF TMP$="" THEN    TMP$ = "CLIENT " + STR$(IDX%)  END IF  RETURNREM ============================================================REM  STATUS.TO.TEXTREM  - MAP CL.STATUS%(IDX%) TO STATUS.TEXT$REM ============================================================STATUS.TO.TEXT:  IF CL.STATUS%(IDX%)=ST_PROSPECT THEN    STATUS.TEXT$ = "PROSPECT"  ELSE    IF CL.STATUS%(IDX%)=ST_ACTIVE THEN      STATUS.TEXT$ = "ACTIVE"    ELSE      IF CL.STATUS%(IDX%)=ST_DORMANT THEN        STATUS.TEXT$ = "DORMANT"      ELSE        IF CL.STATUS%(IDX%)=ST_LOST THEN          STATUS.TEXT$ = "LOST"        ELSE          STATUS.TEXT$ = "UNKNOWN"        END IF      END IF    END IF  END IF  RETURNREM ============================================================REM  LIST.CLIENTSREM ============================================================LIST.CLIENTS:  PRINT  PRINT "CLIENT LIST"  PRINT "-----------"  ANY.FOUND% = 0  IDX% = 1  WHILE IDX%<=MAX.CLIENTS    IF CL.NAME$(IDX%)<>"" OR CL.BALANCE%(IDX%)<>0 THEN      ANY.FOUND% = 1      GOSUB STATUS.TO.TEXT      PRINT IDX%;      PRINT "  ";      GOSUB CL.DISPLAY.NAME$      PRINT TMP$;      PRINT "  STATUS:";      PRINT STATUS.TEXT$;      PRINT "  BAL:";      PRINT CL.BALANCE%(IDX%)    END IF    IDX% = IDX% + 1  WEND  IF ANY.FOUND%=0 THEN    PRINT "NO CLIENTS RECORDED YET."  END IF  RETURNREM ============================================================REM  SHOW.SUMMARYREM  - SIMPLE BUSINESS-ISH METRICSREM ============================================================SHOW.SUMMARY:  PRINT  PRINT "SUMMARY METRICS"  PRINT "---------------"  TOTAL.BAL%      = 0  COUNT.ACTIVE%   = 0  COUNT.OWE.YOU%  = 0  COUNT.YOU.OWE%  = 0  IDX% = 1  WHILE IDX%<=MAX.CLIENTS    BAL% = CL.BALANCE%(IDX%)    TOTAL.BAL% = TOTAL.BAL% + BAL%    IF CL.STATUS%(IDX%)=ST_ACTIVE THEN      COUNT.ACTIVE% = COUNT.ACTIVE% + 1    END IF    IF BAL%>0 THEN      COUNT.OWE.YOU% = COUNT.OWE.YOU% + 1    ELSE      IF BAL%<0 THEN        COUNT.YOU.OWE% = COUNT.YOU.OWE% + 1      END IF    END IF    IDX% = IDX% + 1  WEND  PRINT "ACTIVE CLIENTS   :"; COUNT.ACTIVE%  PRINT "TOTAL BALANCE    :"; TOTAL.BAL%  PRINT "CLIENTS OWE YOU  :"; COUNT.OWE.YOU%  PRINT "YOU OWE CLIENTS  :"; COUNT.YOU.OWE%  RETURN
+REM ============================================================
+REM  EX_HERO_CLIENT_TRACKER.LBP
+REM  - BUSINESS-FLAVOURED HERO DEMO FOR LABEL BASIC PRO
+REM  - SHOWS:
+REM      * CONSTANT / CONSTANT BLOCK
+REM      * ENUM
+REM      * STRUCTURED IF / ELSE / END IF
+REM      * WHILE / WEND
+REM      * REPEAT / UNTIL
+REM      * EXIT WHILE
+REM      * SIMPLE MENU + "SUBROUTINES" VIA GOSUB
+REM ============================================================
+
+REM ##OPTION DEFINE ON
+REM ##OPTION STRICT_ERR ON
+REM ##OPTION REMPASS ON
+
+REM ============================================================
+REM  CONSTANTS & ENUMS
+REM ============================================================
+
+CONSTANT
+  MAX.CLIENTS        = 15
+  NAME.WIDTH         = 18
+  BALANCE.INIT       = 0
+  BALANCE.SALE.STEP  = 100
+  BALANCE.PAY.STEP   = 50
+ENDCONST
+
+ENUM CLIENT.STATUS
+  ST_PROSPECT
+  ST_ACTIVE
+  ST_DORMANT
+  ST_LOST
+END ENUM
+
+REM ============================================================
+REM  GLOBAL STATE
+REM ============================================================
+
+DIM CL.NAME$(MAX.CLIENTS)
+DIM CL.STATUS%(MAX.CLIENTS)
+DIM CL.BALANCE%(MAX.CLIENTS)
+
+QUIT.FLAG% = 0
+
+REM WORK VARIABLES
+MENU.CHOICE% = 0
+IDX%         = 0
+TMP$         = ""
+STATUS.TEXT$ = ""
+
+REM ============================================================
+REM  MAIN ENTRY
+REM ============================================================
+
+MAIN:
+  GOSUB INIT.DATA
+  GOSUB INTRO.TEXT
+
+  REPEAT
+    GOSUB SHOW.MENU
+    GOSUB HANDLE.MENU
+  UNTIL QUIT.FLAG%<>0
+
+  GOSUB OUTRO.TEXT
+  END
+
+
+REM ============================================================
+REM  INIT.DATA
+REM  - RESET CLIENT ARRAYS TO KNOWN STATE
+REM ============================================================
+
+INIT.DATA:
+  IDX% = 1
+  WHILE IDX%<=MAX.CLIENTS
+    CL.NAME$(IDX%)    = ""
+    CL.STATUS%(IDX%)  = ST_PROSPECT
+    CL.BALANCE%(IDX%) = BALANCE.INIT
+    IDX% = IDX% + 1
+  WEND
+  RETURN
+
+
+REM ============================================================
+REM  INTRO / OUTRO
+REM ============================================================
+
+INTRO.TEXT:
+  PRINT
+  PRINT "CLIENT TRACKER - LBP HERO DEMO"
+  PRINT "--------------------------------"
+  PRINT
+  PRINT "THIS SMALL PROGRAM TRACKS UP TO";MAX.CLIENTS;"CLIENTS."
+  PRINT "FOR EACH CLIENT IT STORES:"
+  PRINT "  * NAME"
+  PRINT "  * STATUS (PROSPECT / ACTIVE / DORMANT / LOST)"
+  PRINT "  * RUNNING BALANCE (POSITIVE = THEY OWE YOU)"
+  PRINT
+  RETURN
+
+
+OUTRO.TEXT:
+  PRINT
+  PRINT "GOODBYE FROM CLIENT TRACKER."
+  PRINT
+  PRINT "FINAL SUMMARY:"
+  GOSUB SHOW.SUMMARY
+  RETURN
+
+
+REM ============================================================
+REM  MENU
+REM ============================================================
+
+SHOW.MENU:
+  PRINT
+  PRINT "MAIN MENU"
+  PRINT "---------"
+  PRINT "1 - ADD / UPDATE CLIENT"
+  PRINT "2 - RECORD SALE (INCREASE BALANCE)"
+  PRINT "3 - RECORD PAYMENT (DECREASE BALANCE)"
+  PRINT "4 - LIST CLIENTS"
+  PRINT "5 - SUMMARY METRICS"
+  PRINT "6 - QUIT"
+  PRINT
+  INPUT "CHOICE (1-6)"; MENU.CHOICE%
+  RETURN
+
+
+HANDLE.MENU:
+  IF MENU.CHOICE%=1 THEN
+    GOSUB ADD.OR.UPDATE.CLIENT
+  ELSE
+    IF MENU.CHOICE%=2 THEN
+      GOSUB RECORD.SALE
+    ELSE
+      IF MENU.CHOICE%=3 THEN
+        GOSUB RECORD.PAYMENT
+      ELSE
+        IF MENU.CHOICE%=4 THEN
+          GOSUB LIST.CLIENTS
+        ELSE
+          IF MENU.CHOICE%=5 THEN
+            GOSUB SHOW.SUMMARY
+          ELSE
+            IF MENU.CHOICE%=6 THEN
+              QUIT.FLAG% = 1
+            ELSE
+              PRINT "PLEASE ENTER A NUMBER FROM 1 TO 6."
+            END IF
+          END IF
+        END IF
+      END IF
+    END IF
+  END IF
+  RETURN
+
+
+REM ============================================================
+REM  ADD / UPDATE CLIENT
+REM ============================================================
+
+ADD.OR.UPDATE.CLIENT:
+  PRINT
+  PRINT "ADD / UPDATE CLIENT"
+  PRINT "-------------------"
+
+  GOSUB PROMPT.CLIENT.INDEX
+  IF IDX%<1 THEN
+    PRINT "CANCELLED."
+    RETURN
+  END IF
+
+  PRINT "CURRENT NAME: "; CL.NAME$(IDX%)
+  INPUT "NEW NAME (EMPTY = LEAVE UNCHANGED)"; TMP$
+
+  IF TMP$<>"" THEN
+    CL.NAME$(IDX%) = TMP$
+  END IF
+
+  PRINT
+  PRINT "STATUS CODES:"
+  PRINT " 0 - PROSPECT"
+  PRINT " 1 - ACTIVE"
+  PRINT " 2 - DORMANT"
+  PRINT " 3 - LOST"
+  PRINT "CURRENT STATUS:";
+  GOSUB STATUS.TO.TEXT
+  PRINT STATUS.TEXT$
+  INPUT "NEW STATUS (0-3, -1 = LEAVE)"; NEW.ST%
+
+  IF NEW.ST%>=0 THEN
+    IF NEW.ST%<=3 THEN
+      CL.STATUS%(IDX%) = NEW.ST%
+    ELSE
+      PRINT "IGNORING INVALID STATUS."
+    END IF
+  END IF
+
+  PRINT
+  PRINT "CLIENT SAVED."
+  RETURN
+
+
+REM ============================================================
+REM  RECORD SALE / PAYMENT
+REM ============================================================
+
+RECORD.SALE:
+  PRINT
+  PRINT "RECORD SALE (CLIENT OWES YOU MORE)"
+  PRINT "----------------------------------"
+
+  GOSUB PROMPT.CLIENT.INDEX
+  IF IDX%<1 THEN
+    PRINT "CANCELLED."
+    RETURN
+  END IF
+
+  PRINT "CLIENT: "; CL.DISPLAY.NAME$(IDX%)
+  INPUT "AMOUNT (DEFAULT ";BALANCE.SALE.STEP;")"; AMT%
+  IF AMT%<=0 THEN
+    AMT% = BALANCE.SALE.STEP
+  END IF
+
+  CL.BALANCE%(IDX%) = CL.BALANCE%(IDX%) + AMT%
+  PRINT "NEW BALANCE:"; CL.BALANCE%(IDX%)
+  RETURN
+
+
+RECORD.PAYMENT:
+  PRINT
+  PRINT "RECORD PAYMENT (CLIENT OWES YOU LESS)"
+  PRINT "-------------------------------------"
+
+  GOSUB PROMPT.CLIENT.INDEX
+  IF IDX%<1 THEN
+    PRINT "CANCELLED."
+    RETURN
+  END IF
+
+  PRINT "CLIENT: "; CL.DISPLAY.NAME$(IDX%)
+  INPUT "AMOUNT (DEFAULT ";BALANCE.PAY.STEP;")"; AMT%
+  IF AMT%<=0 THEN
+    AMT% = BALANCE.PAY.STEP
+  END IF
+
+  CL.BALANCE%(IDX%) = CL.BALANCE%(IDX%) - AMT%
+  PRINT "NEW BALANCE:"; CL.BALANCE%(IDX%)
+  RETURN
+
+
+REM ============================================================
+REM  PROMPT FOR CLIENT INDEX (1..MAX, 0=CANCEL)
+REM  - USES STRUCTURED WHILE / EXIT WHILE
+REM ============================================================
+
+PROMPT.CLIENT.INDEX:
+  IDX% = -1
+
+  WHILE IDX%<0
+    PRINT
+    INPUT "CLIENT NUMBER (1-";MAX.CLIENTS;", 0=CANCEL)"; IDX%
+
+    IF IDX%=0 THEN
+      RETURN
+    END IF
+
+    IF IDX%<1 OR IDX%>MAX.CLIENTS THEN
+      PRINT "PLEASE ENTER A NUMBER BETWEEN 1 AND";MAX.CLIENTS;"OR 0 TO CANCEL."
+      IDX% = -1
+    ELSE
+      EXIT WHILE
+    END IF
+  WEND
+
+  RETURN
+
+
+REM ============================================================
+REM  CL.DISPLAY.NAME$
+REM  - RETURNS A NICELY FORMATTED NAME FOR CLIENT IDX%
+REM  - IF NAME IS EMPTY, USES "CLIENT n"
+REM ============================================================
+
+CL.DISPLAY.NAME$:
+  TMP$ = CL.NAME$(IDX%)
+  IF TMP$="" THEN
+    TMP$ = "CLIENT " + STR$(IDX%)
+  END IF
+  RETURN
+
+
+REM ============================================================
+REM  STATUS.TO.TEXT
+REM  - MAP CL.STATUS%(IDX%) TO STATUS.TEXT$
+REM ============================================================
+
+STATUS.TO.TEXT:
+  IF CL.STATUS%(IDX%)=ST_PROSPECT THEN
+    STATUS.TEXT$ = "PROSPECT"
+  ELSE
+    IF CL.STATUS%(IDX%)=ST_ACTIVE THEN
+      STATUS.TEXT$ = "ACTIVE"
+    ELSE
+      IF CL.STATUS%(IDX%)=ST_DORMANT THEN
+        STATUS.TEXT$ = "DORMANT"
+      ELSE
+        IF CL.STATUS%(IDX%)=ST_LOST THEN
+          STATUS.TEXT$ = "LOST"
+        ELSE
+          STATUS.TEXT$ = "UNKNOWN"
+        END IF
+      END IF
+    END IF
+  END IF
+  RETURN
+
+
+REM ============================================================
+REM  LIST.CLIENTS
+REM ============================================================
+
+LIST.CLIENTS:
+  PRINT
+  PRINT "CLIENT LIST"
+  PRINT "-----------"
+
+  ANY.FOUND% = 0
+  IDX% = 1
+  WHILE IDX%<=MAX.CLIENTS
+    IF CL.NAME$(IDX%)<>"" OR CL.BALANCE%(IDX%)<>0 THEN
+      ANY.FOUND% = 1
+      GOSUB STATUS.TO.TEXT
+      PRINT IDX%;
+      PRINT "  ";
+      GOSUB CL.DISPLAY.NAME$
+      PRINT TMP$;
+      PRINT "  STATUS:";
+      PRINT STATUS.TEXT$;
+      PRINT "  BAL:";
+      PRINT CL.BALANCE%(IDX%)
+    END IF
+    IDX% = IDX% + 1
+  WEND
+
+  IF ANY.FOUND%=0 THEN
+    PRINT "NO CLIENTS RECORDED YET."
+  END IF
+
+  RETURN
+
+
+REM ============================================================
+REM  SHOW.SUMMARY
+REM  - SIMPLE BUSINESS-ISH METRICS
+REM ============================================================
+
+SHOW.SUMMARY:
+  PRINT
+  PRINT "SUMMARY METRICS"
+  PRINT "---------------"
+
+  TOTAL.BAL%      = 0
+  COUNT.ACTIVE%   = 0
+  COUNT.OWE.YOU%  = 0
+  COUNT.YOU.OWE%  = 0
+
+  IDX% = 1
+  WHILE IDX%<=MAX.CLIENTS
+    BAL% = CL.BALANCE%(IDX%)
+    TOTAL.BAL% = TOTAL.BAL% + BAL%
+
+    IF CL.STATUS%(IDX%)=ST_ACTIVE THEN
+      COUNT.ACTIVE% = COUNT.ACTIVE% + 1
+    END IF
+
+    IF BAL%>0 THEN
+      COUNT.OWE.YOU% = COUNT.OWE.YOU% + 1
+    ELSE
+      IF BAL%<0 THEN
+        COUNT.YOU.OWE% = COUNT.YOU.OWE% + 1
+      END IF
+    END IF
+
+    IDX% = IDX% + 1
+  WEND
+
+  PRINT "ACTIVE CLIENTS   :"; COUNT.ACTIVE%
+  PRINT "TOTAL BALANCE    :"; TOTAL.BAL%
+  PRINT "CLIENTS OWE YOU  :"; COUNT.OWE.YOU%
+  PRINT "YOU OWE CLIENTS  :"; COUNT.YOU.OWE%
+  RETURN
