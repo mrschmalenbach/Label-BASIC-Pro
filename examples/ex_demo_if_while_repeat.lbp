@@ -1,1 +1,113 @@
-REM ============================================================REM  EX_DEMO_IF_WHILE_REPEAT.LBPREM  - BASIC DEMO OF STRUCTURED IF / WHILE / REPEATREM ============================================================REM ##OPTION DEFINE ONREM ##OPTION STRICT_ERR OFFREM SIMPLE MENU-ISH LOOPREPEAT  PRINT  PRINT "DEMO MENU"  PRINT "---------"  PRINT "1 - TEST IF/ELSE"  PRINT "2 - TEST WHILE/WEND"  PRINT "3 - TEST REPEAT/UNTIL"  PRINT "0 - QUIT"  PRINT  INPUT "CHOICE"; CHOICE%  IF CHOICE%=1 THEN    GOSUB TEST.IF  ELSE    IF CHOICE%=2 THEN      GOSUB TEST.WHILE    ELSE      IF CHOICE%=3 THEN        GOSUB TEST.REPEAT      ELSE        IF CHOICE%<>0 THEN          PRINT "UNKNOWN OPTION"        END IF      END IF    END IF  END IFUNTIL CHOICE%=0PRINTPRINT "DEMO COMPLETE."REM ============================================================REM  TEST.IFREM ============================================================TEST.IF:  PRINT  PRINT "IF / ELSE / END IF DEMO"  INPUT "ENTER A NUMBER"; N%  IF N%<0 THEN    PRINT "NEGATIVE"  ELSE    IF N%=0 THEN      PRINT "ZERO"    ELSE      PRINT "POSITIVE"    END IF  END IF  RETURNREM ============================================================REM  TEST.WHILEREM ============================================================TEST.WHILE:  PRINT  PRINT "WHILE / WEND DEMO"  INPUT "COUNT FROM 1 TO"; LIMIT%  I% = 1  WHILE I%<=LIMIT%    PRINT "I =";I%    IF I%=5 THEN      PRINT "HITTING CONTINUE AT I=5"      CONTINUE WHILE    END IF    I% = I% + 1  WEND  PRINT "DONE WHILE LOOP."  RETURNREM ============================================================REM  TEST.REPEATREM ============================================================TEST.REPEAT:  PRINT  PRINT "REPEAT / UNTIL DEMO"  COUNT% = 0  REPEAT    COUNT% = COUNT% + 1    PRINT "COUNT =";COUNT%    IF COUNT%=3 THEN      PRINT "CONTINUE REPEAT AT 3 (SKIP CHECK)"      CONTINUE REPEAT    END IF    IF COUNT%>7 THEN      PRINT "EXIT REPEAT AT >7"      EXIT REPEAT    END IF  UNTIL COUNT%>=10  PRINT "REPEAT LOOP FINISHED."  RETURN
+REM ============================================================
+REM  EX_DEMO_IF_WHILE_REPEAT.LBP
+REM  - BASIC DEMO OF STRUCTURED IF / WHILE / REPEAT
+REM ============================================================
+
+REM ##OPTION DEFINE ON
+REM ##OPTION STRICT_ERR OFF
+
+REM SIMPLE MENU-ISH LOOP
+
+REPEAT
+  PRINT
+  PRINT "DEMO MENU"
+  PRINT "---------"
+  PRINT "1 - TEST IF/ELSE"
+  PRINT "2 - TEST WHILE/WEND"
+  PRINT "3 - TEST REPEAT/UNTIL"
+  PRINT "0 - QUIT"
+  PRINT
+  INPUT "CHOICE"; CHOICE%
+
+  IF CHOICE%=1 THEN
+    GOSUB TEST.IF
+  ELSE
+    IF CHOICE%=2 THEN
+      GOSUB TEST.WHILE
+    ELSE
+      IF CHOICE%=3 THEN
+        GOSUB TEST.REPEAT
+      ELSE
+        IF CHOICE%<>0 THEN
+          PRINT "UNKNOWN OPTION"
+        END IF
+      END IF
+    END IF
+  END IF
+
+UNTIL CHOICE%=0
+
+PRINT
+PRINT "DEMO COMPLETE."
+
+
+REM ============================================================
+REM  TEST.IF
+REM ============================================================
+
+TEST.IF:
+  PRINT
+  PRINT "IF / ELSE / END IF DEMO"
+  INPUT "ENTER A NUMBER"; N%
+
+  IF N%<0 THEN
+    PRINT "NEGATIVE"
+  ELSE
+    IF N%=0 THEN
+      PRINT "ZERO"
+    ELSE
+      PRINT "POSITIVE"
+    END IF
+  END IF
+
+  RETURN
+
+
+REM ============================================================
+REM  TEST.WHILE
+REM ============================================================
+
+TEST.WHILE:
+  PRINT
+  PRINT "WHILE / WEND DEMO"
+  INPUT "COUNT FROM 1 TO"; LIMIT%
+
+  I% = 1
+  WHILE I%<=LIMIT%
+    PRINT "I =";I%
+    IF I%=5 THEN
+      PRINT "HITTING CONTINUE AT I=5"
+      CONTINUE WHILE
+    END IF
+    I% = I% + 1
+  WEND
+
+  PRINT "DONE WHILE LOOP."
+  RETURN
+
+
+REM ============================================================
+REM  TEST.REPEAT
+REM ============================================================
+
+TEST.REPEAT:
+  PRINT
+  PRINT "REPEAT / UNTIL DEMO"
+
+  COUNT% = 0
+
+  REPEAT
+    COUNT% = COUNT% + 1
+    PRINT "COUNT =";COUNT%
+    IF COUNT%=3 THEN
+      PRINT "CONTINUE REPEAT AT 3 (SKIP CHECK)"
+      CONTINUE REPEAT
+    END IF
+    IF COUNT%>7 THEN
+      PRINT "EXIT REPEAT AT >7"
+      EXIT REPEAT
+    END IF
+  UNTIL COUNT%>=10
+
+  PRINT "REPEAT LOOP FINISHED."
+  RETURN
