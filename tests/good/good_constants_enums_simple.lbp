@@ -1,1 +1,51 @@
-REM good_constants_enums_simple.lbpREM Simple, well-formed CONSTANT and ENUM usageREM ##OPTION STRICT_ERR ONREM ##OPTION DEFINE ONPRINT "STARTING CONSTANT/ENUM TEST..."REM -----------------------------------------REM CONSTANT blockREM -----------------------------------------CONSTANTMAX_ROWS% = 25MAX_COLS% = 40WELCOME.MSG$ = "HELLO FROM CONSTANTS"ENDCONSTREM -----------------------------------------REM Single-line CONSTANTREM -----------------------------------------CONSTANT PI_TIMES_1000 = 3141REM Use constants in expressionsAREA.SIZE% = MAX_ROWS% * MAX_COLS%PRINT "MAX_ROWS  =";MAX_ROWS%PRINT "MAX_COLS  =";MAX_COLS%PRINT "AREA SIZE =";AREA.SIZE%PRINT WELCOME.MSG$PRINT "PI*1000   =";PI_TIMES_1000REM -----------------------------------------REM ENUM blockREM -----------------------------------------ENUM COLORSCOLOR_REDCOLOR_GREENCOLOR_BLUEEND ENUMREM Assign and use enum valuesCURRENT.COLOR% = COLOR_GREENPRINT "COLOR_RED   =";COLOR_REDPRINT "COLOR_GREEN =";COLOR_GREENPRINT "COLOR_BLUE  =";COLOR_BLUEPRINT "CURRENT.COLOR=";CURRENT.COLOR%PRINT "CONSTANT/ENUM TEST COMPLETE."
+REM good_constants_enums_simple.lbp
+REM Simple, well-formed CONSTANT and ENUM usage
+
+REM ##OPTION STRICT_ERR ON
+REM ##OPTION DEFINE ON
+
+PRINT "STARTING CONSTANT/ENUM TEST..."
+
+REM -----------------------------------------
+REM CONSTANT block
+REM -----------------------------------------
+
+CONSTANT
+MAX_ROWS% = 25
+MAX_COLS% = 40
+WELCOME.MSG$ = "HELLO FROM CONSTANTS"
+ENDCONST
+
+REM -----------------------------------------
+REM Single-line CONSTANT
+REM -----------------------------------------
+
+CONSTANT PI_TIMES_1000 = 3141
+
+REM Use constants in expressions
+AREA.SIZE% = MAX_ROWS% * MAX_COLS%
+PRINT "MAX_ROWS  =";MAX_ROWS%
+PRINT "MAX_COLS  =";MAX_COLS%
+PRINT "AREA SIZE =";AREA.SIZE%
+PRINT WELCOME.MSG$
+PRINT "PI*1000   =";PI_TIMES_1000
+
+REM -----------------------------------------
+REM ENUM block
+REM -----------------------------------------
+
+ENUM COLORS
+COLOR_RED
+COLOR_GREEN
+COLOR_BLUE
+END ENUM
+
+REM Assign and use enum values
+CURRENT.COLOR% = COLOR_GREEN
+
+PRINT "COLOR_RED   =";COLOR_RED
+PRINT "COLOR_GREEN =";COLOR_GREEN
+PRINT "COLOR_BLUE  =";COLOR_BLUE
+PRINT "CURRENT.COLOR=";CURRENT.COLOR%
+
+PRINT "CONSTANT/ENUM TEST COMPLETE."
